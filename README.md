@@ -40,7 +40,6 @@ Set default `entry point` to `server.js` and go with default values for other.
 Add `server.js` in root folder and add below content
 
 ```js
-
 // Get express server files
 const express = require('express');
 
@@ -58,14 +57,12 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, ()=>{
     console.log(`Server started on port ${PORT}`);
 });
-
 ```
 
 5. Start / Run the project
 Create custom commands, scripts. In `server.js` scripts
 
 ```js
-
 "scripts": {
     "start": "node server", // Wil run on deployment at Horuku
     "server": "nodemon server", // Will run locally
@@ -73,3 +70,55 @@ Create custom commands, scripts. In `server.js` scripts
 ```
 - Now run `npm run server`  This will fire this script of nodemon "server": "nodemon server",
 
+5. Establish database connection
+- Copy / Get connection string from the Mongo Db
+- Create a folder in root directory `config`
+- Create a file therein `default.json`. The `config` package which we had installed will take make it available globally.
+- Put this connection string in `default.json`
+```js
+{
+    "mongoURI": "mongodb+srv://malickateeq:@teeQ7886@devconnector.y3kbb.mongodb.net/<dbname>?retryWrites=true&w=majority"
+}
+```
+- Create a new file `db.js` inside `config` folder.
+* Import `moongose`, the package which we've already installed.
+```js
+//  Fetch "mongoose" package files
+const mongoose = require('mongoose');
+
+// Get config variables to set up connection
+const config = require("config");
+// const { try } = require('bluebird');
+
+// To get the connection string
+const db = config.get("mongoURL");
+
+// Create a async / await function to coeect with the database. async / await is the new standard to follow
+const connectDB = async () => {
+    try
+    {
+        // await cause mongoose.connect(...) will return a promise
+        await mongoose.connect(db, {
+            useNewUrlParser: true,
+        });
+
+        console.log("MongoDb Connected...");
+    }
+    catch(err)
+    {
+        console.error(err.message);
+
+        // Make the application fail / terminate
+        process.exit(1);    // Exit process with failure.
+    }
+}
+module.exports = connectDB;
+```
+* Connect to DB in `server.js`
+```js
+const connectDB = require("./config/db");
+
+// Connect Database
+connectDB();
+
+```

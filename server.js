@@ -1,8 +1,12 @@
 // Get express server files
 const express = require('express');
+const connectDB = require("./config/db");
 
 // Initialize express server in a var
 const app = express();
+
+// Connect Database
+connectDB();
 
 // An end-point for testing.
 app.get('/', (req, res) => res.send("API running"));
