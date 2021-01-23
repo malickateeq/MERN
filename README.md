@@ -122,3 +122,36 @@ const connectDB = require("./config/db");
 connectDB();
 
 ```
+
+# Structuring Project
+
+1. Routes Structure
+* Create a folder `routes` in root dir
+* Create a subfolder `api` in routes
+* Now create route files like; `users.js`, `auth.js` and definde routes therein.
+
+# Routing
+
+* Register routes in `routes/abc.js`
+```js
+const express = require("express");
+const router = express.Router();
+
+// @route    GET end/point
+// @desc     Test route
+// @access   Public
+router.get("/", (req, res) => res.send("User router"));
+
+module.exports = router;
+```
+
+* Import these routes in `server.js`
+```js
+// Define Routes
+app.user("/any-prefix", require("./routes/api/users.js"));
+app.user("/any-prefix", require("./routes/api/admin.js"));
+```
+
+# Models
+- We use models to interact with the database.
+* Create a new folder `models` in root dir

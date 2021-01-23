@@ -8,8 +8,11 @@ const app = express();
 // Connect Database
 connectDB();
 
-// An end-point for testing.
-app.get('/', (req, res) => res.send("API running"));
+// Registering Routes
+app.use("/api/users", require("./routes/api/users"));
+app.use("/api/profile", require("./routes/api/profile"));
+app.use("/api/posts", require("./routes/api/posts"));
+app.use("/api/auth", require("./routes/api/auth"));
 
 // Set a port to listen this server OR locally run it over 5000
 // This will fetch the PORT number from the environment file.
