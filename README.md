@@ -291,3 +291,24 @@ try {
 
 ```
 
+# Json Web Token (JWT)
+- It is use to authenticate users
+- 3 parts: Header.Payload.Signature
+
+1. Add this secret key in `config` 
+```js
+"jwtSecret": "AllIsWellToken"
+```
+
+2. Creating the token
+```js
+// 1. Include jwt library
+const jwt = require("jsonwebtoken");
+
+// 2. Create Payload
+const payload = {  },
+
+// 3. Sign JWT
+
+
+```
