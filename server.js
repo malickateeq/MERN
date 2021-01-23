@@ -8,6 +8,9 @@ const app = express();
 // Connect Database
 connectDB();
 
+// To get data of Request's body
+app.use(express.json({ extended: false }));
+
 // Registering Routes
 app.use("/api/users", require("./routes/api/users"));
 app.use("/api/profile", require("./routes/api/profile"));

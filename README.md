@@ -100,6 +100,7 @@ const connectDB = async () => {
         // await cause mongoose.connect(...) will return a promise
         await mongoose.connect(db, {
             useNewUrlParser: true,
+            useCreateIndex: true
         });
 
         console.log("MongoDb Connected...");
@@ -187,5 +188,106 @@ const userSchema = new mongoose.Schema({
 });
 
 // Export this schema
-module.export = User = mongoose.model('user', userSchema);
+module.exports = User = mongoose.model('user', userSchema);
 ```
+
+# Http Requests
+
+1. Create an endpoint
+```js
+// Register a routes
+router.post("/", (req, res) => {
+    console.log(req);
+});
+```
+
+2. To access data / body of a request we need to enable middleware in express
+- Goto `server.js` and add this line
+```js
+// To get data of Request's body
+app.use(express.json({ extended: false }));
+```
+
+## Express Validator
+- Use to validate user's input data
+- For details: Express-Validator [Express Validator]("https://express-validator.github.io/docs/")
+```js
+// Include package files
+const { check, validationResult } = require("express-validator/check");
+
+// Validate Request
+router.post("/", [
+
+    // Validation rules here..
+    // check("filedName", "Error message").ruleA().ruleB();
+    check("name", "Name is required.").not().isEmpty(),
+    
+    check("email", "Please enter a valid email address.").isEmail(),
+    
+    check("password", "Please enter a password with 6 or more characters.").isLength({ min: 6 })
+    
+],
+async (req, res) => {
+
+    // Perform Validation
+    const errors = validationResult(req);
+
+    // If there're errors then
+    if(!errors.isEmpty())
+    {
+        return res.status(400).json({ errors: errors.array() })
+    }
+    console.log(req);
+    res.send("User registered successfully!");
+});
+```
+
+## String a record in database
+```js
+// 1. Include the User model
+const User = require("../../models/User");
+
+// 2. Fetch request contents after validations
+const { name, email, password } = req.body;
+
+// 3. Storing a record in database
+try {
+    // 1. See if user already exists
+    let user = await User.findOne({ email: email });
+
+    if(user) {
+        // Return the same error in format as default one
+        res.status(400).json({ errors: [{ msg: "User already exists" }] });
+    }
+
+    // 2. Get Users Gravator
+    const avatar = gravatar.url(email, {
+        s: "200",
+        r: "pg",
+        d: "mm"
+    });
+
+    user = new User({
+        name,
+        email,
+        password,
+        avatar
+    });
+
+    // 3. Encrypt password
+    // Use salt the more the secure
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    await user.save();
+
+    // 4. Return jsonwebtoken
+    res.send("User registered successfully!");
+
+} catch (err) {
+    // Server error
+    console.error(err.message);
+    res.status(500).send("Server error");
+}
+
+```
+
