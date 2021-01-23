@@ -309,6 +309,140 @@ const jwt = require("jsonwebtoken");
 const payload = {  },
 
 // 3. Sign JWT
+jwt.sign(
+    payload, 
+    config.get("jwtSecret"),
+    { expiresIn: 36000 },
+    (err, token) => {
+        if(err) throw err;
+        return res.json({
+            token
+        });
+});
+```
 
+# Authentication
+- Firstly get the JWT to authenticate users
+1. Create a folder `middleware` and a file `auth.js` therein.
+2. Implement JWT authentiaction.
+
+## Create a middleware
+```js
+const jwt = require("jsonwebtoken");
+const config = require("config");
+
+module.exports = function (req, res, next)
+{
+    // 1. Get the token from the header
+    const token = req.header("x-auth-token");
+
+    // Check if no token
+    if(!token){
+        return res.status(401).json({ msg: "No token found." });
+    }
+
+    // 2. Verify the token
+    try {
+        const decoded = jwt.verify(token, config.get("jwtSecret"));
+
+        req.user = decoded.user;
+
+        next();
+    } catch (err) {
+        res.status(401).json({ msg: "Token is not valid." });
+    }
+}
+```
+
+## Use middleware for a route
+
+```js
+
+// 1. Include middleware file in routes
+const auth = require("./../../middleware/auth");
+
+// 2. Apply this middleware to a route
+
+// @route    GET api/auth
+// @desc     Test route
+// @access   Only JWT verified requests
+router.get("/", auth, async (req, res) => {
+    
+    try {
+        const user = await User.findById(req.user.id).select("-password");
+        return res.json(user);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send("Server error");
+    }
+
+});
+
+// 3. Get Authentication token via Credentials
+// @route    GET api/auth
+// @desc     Test route
+// @access   Public
+router.get("/", auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select("-password");
+        return res.json(user);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send("Server error");
+    }
+});
+
+// @route    POST api/auth
+// @desc     Authenticate user & get token
+// @access   Public
+router.post("/", [
+    check("email", "Please enter a valid email address.").isEmail(),
+    check("password", "Password is required.").exists()
+],
+async (req, res) => {
+    // Perform Validation
+    const errors = validationResult(req);
+
+    // If there're errors then
+    if(!errors.isEmpty())
+    {
+        return res.status(400).json({ errors: errors.array() })
+    }
+    
+    const { email, password } = req.body;
+    try {
+        let user = await User.findOne({ email: email });
+
+        if(!user) {
+            return res.status(400).json({ errors: [{ msg: "Invalid credentials." }] });
+        }
+    
+        const payload = {
+            user: {
+                id: user.id
+            }
+        };
+        const isMatch = await bcrypt.compare(password, user.password);
+        if(!isMatch)
+        {
+            return res.status(400).json({ errors: [{ msg: "Invalid credentials." }] });
+        }
+
+        jwt.sign(
+            payload, 
+            config.get("jwtSecret"),
+            { expiresIn: 36000 },
+            (err, token) => {
+                if(err) throw err;
+                return res.json({
+                    token
+                });
+        });
+    } catch (err) {
+        // Server error
+        console.error(err.message);
+        return res.status(500).send("Server error");
+    }
+});
 
 ```
