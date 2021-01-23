@@ -154,4 +154,38 @@ app.user("/any-prefix", require("./routes/api/admin.js"));
 
 # Models
 - We use models to interact with the database.
-* Create a new folder `models` in root dir
+
+1. Create a new folder `models` in root dir
+2. Now create a file / Model therein. i.e. `User.js`
+3. Then;
+```js
+// Import `mongoose` package
+const mongoose = require("mongoose");
+
+// Create User Schema
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    avatar: {
+        type: String,
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+// Export this schema
+module.export = User = mongoose.model('user', userSchema);
+```
