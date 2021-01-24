@@ -153,44 +153,6 @@ app.user("/any-prefix", require("./routes/api/users.js"));
 app.user("/any-prefix", require("./routes/api/admin.js"));
 ```
 
-# Models
-- We use models to interact with the database.
-
-1. Create a new folder `models` in root dir
-2. Now create a file / Model therein. i.e. `User.js`
-3. Then;
-```js
-// Import `mongoose` package
-const mongoose = require("mongoose");
-
-// Create User Schema
-const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    avatar: {
-        type: String,
-    },
-    date: {
-        type: Date,
-        default: Date.now
-    }
-});
-
-// Export this schema
-module.exports = User = mongoose.model('user', userSchema);
-```
-
 # Http Requests
 
 1. Create an endpoint
@@ -210,6 +172,7 @@ app.use(express.json({ extended: false }));
 
 ## Express Validator
 - Use to validate user's input data
+- Express Validator is basically a middleware.
 - For details: Express-Validator [Express Validator]("https://express-validator.github.io/docs/")
 ```js
 // Include package files
@@ -217,7 +180,6 @@ const { check, validationResult } = require("express-validator/check");
 
 // Validate Request
 router.post("/", [
-
     // Validation rules here..
     // check("filedName", "Error message").ruleA().ruleB();
     check("name", "Name is required.").not().isEmpty(),
@@ -225,7 +187,6 @@ router.post("/", [
     check("email", "Please enter a valid email address.").isEmail(),
     
     check("password", "Please enter a password with 6 or more characters.").isLength({ min: 6 })
-    
 ],
 async (req, res) => {
 
@@ -444,5 +405,97 @@ async (req, res) => {
         return res.status(500).send("Server error");
     }
 });
+
+```
+
+# Mongo DB with mongoose
+
+- Always use `await` before calling a mongoose method. Coz Mangoose always returns a promise. 
+
+## Creating Models
+- We use models to interact with the database.
+
+1. Create a new folder `models` in root dir
+2. Now create a file / Model therein. i.e. `User.js`
+3. Then;
+```js
+// Import `mongoose` package
+const mongoose = require("mongoose");
+
+// Create User Schema
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    avatar: {
+        type: String,
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+// Export this schema
+module.exports = User = mongoose.model('user', userSchema);
+```
+
+## Using Models
+
+### Store a record
+```js
+// Include the model file
+const User = require("../../models/User");
+
+user = new User({
+    name,
+    email,
+    password,
+    avatar
+});
+
+// Manipulate fields
+user.password = passwor + "salt";
+await user.save();
+```
+
+### Fetch a record
+```js
+// Find by Id function
+const user = await User.findById(req.user.id).select("-password");
+
+// Specify attribute in object attr: value
+const user = await User.findOne({ user: req.user.id }).select("-password");
+```
+
+### Select Fields
+```js
+// To fetch a field name
+.select("fieldName");
+
+// To exclude a field with - sign
+.select("-password")
+```
+
+### Select from related collections
+```js
+// .populate("relatedCollectionName", ["attr1", "attr2"]
+.populate("user", ["name", "avatar"]);
+```
+
+### Find and Update
+```js
+// Update the profile                      Find by user          Fields
+profile = await Profile.findOneAndUpdate({ user: req.user.id }, { $set: profileFields }, { new: true });
 
 ```

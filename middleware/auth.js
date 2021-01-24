@@ -9,7 +9,7 @@ module.exports = function (req, res, next)
 
     // Check if no token
     if(!token){
-        return res.status(401).json({ msg: "No token found." });
+        return res.status(401).json({ msg: "Authorization failed, Invalid token." });
     }
 
     // 2. Verify the token
