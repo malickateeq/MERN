@@ -476,6 +476,9 @@ await user.save();
 
 ### Fetch a record
 ```js
+// Fetch all and sort by most recent (-1)
+const posts = await Post.find().sort({ date: -1 });
+
 // Find by Id function
 const user = await User.findById(req.user.id).select("-password");
 
@@ -533,4 +536,15 @@ const removeIndex = profile.experience.map(item => item.id).indexOf(req.params.e
 
 profile.experience.splice(removeIndex, 1);
 await profile.save();
+```
+
+### Delete a record
+```js
+const post = await Post.findById(res.params.id);
+// Check on user
+if(post.user.toString() !== req.user.id){
+    return res.status(500).json({ msg: "User not authorized."});
+}
+await post.remove();
+return res.json({ msg: "Post removed."});
 ```
