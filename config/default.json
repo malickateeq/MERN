@@ -1,4 +1,6 @@
 {
     "mongoURI": "mongodb+srv://malickateeq:malikateeq123456@devconnector.y3kbb.mongodb.net/test?retryWrites=true&w=majority",
-    "jwtSecret": "AllIsWellToken"
+    "jwtSecret": "AllIsWellToken",
+    "githubClientId": "2a4781b146266200337f",
+    "githubClientSecret": "454a83d9caa3e9b5a429aba62369a2a71bc6709e"
 }

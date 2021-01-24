@@ -519,3 +519,18 @@ const profile = await Profile.findOne({ user: req.user.id });
 profile.experience.unshift(newExp);
 await profile.save();
 ```
+
+### Remove an object from a record
+- Mongo DB has object Id within a recordId
+- It is easy to nest related data in a single document
+- Not need for too many relationships
+- LIKE: user { _id, email, education: { _id, name } }
+
+```js
+const profile = await Profile.findOne({ user: req.user.id });
+// Get the correnct experience to remove
+const removeIndex = profile.experience.map(item => item.id).indexOf(req.params.exp_id);
+
+profile.experience.splice(removeIndex, 1);
+await profile.save();
+```
