@@ -18,6 +18,8 @@ module.exports = function (req, res, next)
 
         req.user = decoded.user;
 
+        // TODO: Add endpoint validation - or token chaining
+
         next();
     } catch (err) {
         res.status(401).json({ msg: "Token is not valid." });

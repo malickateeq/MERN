@@ -170,6 +170,11 @@ router.post("/", (req, res) => {
 app.use(express.json({ extended: false }));
 ```
 
+3. Access URL Parameters
+```js
+req.params.param1;
+```
+
 ## Express Validator
 - Use to validate user's input data
 - Express Validator is basically a middleware.
@@ -498,4 +503,10 @@ const user = await User.findOne({ user: req.user.id }).select("-password");
 // Update the profile                      Find by user          Fields
 profile = await Profile.findOneAndUpdate({ user: req.user.id }, { $set: profileFields }, { new: true });
 
+// If put invalid (length) objectId it will throw an error
+// In catch
+if(error.kind == "ObjectId")
+{
+    return res.status(400).json({ msg: "Profile not found." });
+}
 ```
