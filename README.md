@@ -510,3 +510,12 @@ if(error.kind == "ObjectId")
     return res.status(400).json({ msg: "Profile not found." });
 }
 ```
+
+### Find and Update a few fields
+```js
+const profile = await Profile.findOne({ user: req.user.id });
+// push insert in the end
+// unshift insert in the beginning
+profile.experience.unshift(newExp);
+await profile.save();
+```
