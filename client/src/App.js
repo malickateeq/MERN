@@ -4,26 +4,35 @@ import Landing from "./components/layout/Landing";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
 import { BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import Alert from "./components/common/Alert";
+
+// Redux
+// This package will connect React with Redux
+import { Provider } from "react-redux";
+import store from "./store/store";
 
 import './App.css';
 
 const App = () => (
-  <Router>
-    <Fragment>
-      <Navbar />
+  <Provider store={store}>
+    <Router>
+      <Fragment>
+        <Navbar />
 
-      {/* To cover entire width */}
-      <Route exact path="/" component={ Landing } />
+        {/* To cover entire width */}
+        <Route exact path="/" component={ Landing } />
 
-      <section className="container">
-        <Switch>
-          <Route exact path="/register" component={ Register } />
-          <Route exact path="/login" component={ Login } />
-        </Switch>
-      </section>
+        <section className="container">
+          <Alert />
+          <Switch>
+            <Route exact path="/register" component={ Register } />
+            <Route exact path="/login" component={ Login } />
+          </Switch>
+        </section>
 
-    </Fragment>
-  </Router>
+      </Fragment>
+    </Router>
+  </Provider>
 );
 
 export default App;
